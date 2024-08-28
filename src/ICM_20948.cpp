@@ -145,6 +145,13 @@ ICM_20948_AGMT_t ICM_20948::getAGMT(void)
   return agmt;
 }
 
+ICM_20948_AGMT_t ICM_20948::getAGMT_fast(void)
+{
+  status = ICM_20948_get_agmt_fast(&_device, &agmt);
+
+  return agmt;
+}
+
 float ICM_20948::magX(void)
 {
   return getMagUT(agmt.mag.axes.x);

@@ -1099,6 +1099,32 @@ ICM_20948_Status_e ICM_20948_get_agmt(ICM_20948_Device_t *pdev, ICM_20948_AGMT_t
   return retval;
 }
 
+ICM_20948_Status_e ICM_20948_get_agmt_fast(ICM_20948_Device_t *pdev, ICM_20948_AGMT_t *pagmt)
+{
+  if (pagmt == NULL)
+  {
+    return ICM_20948_Stat_ParamErr;
+  }
+
+  ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
+  const uint8_t numbytes = 12; //Read Accel, gyro only
+  uint8_t buff[numbytes];
+
+  // Get readings
+  retval |= ICM_20948_set_bank(pdev, 0);
+  retval |= ICM_20948_execute_r(pdev, (uint8_t)AGB0_REG_ACCEL_XOUT_H, buff, numbytes);
+
+  pagmt->acc.axes.x = ((buff[0] << 8) | (buff[1] & 0xFF));
+  pagmt->acc.axes.y = ((buff[2] << 8) | (buff[3] & 0xFF));
+  pagmt->acc.axes.z = ((buff[4] << 8) | (buff[5] & 0xFF));
+
+  pagmt->gyr.axes.x = ((buff[6] << 8) | (buff[7] & 0xFF));
+  pagmt->gyr.axes.y = ((buff[8] << 8) | (buff[9] & 0xFF));
+  pagmt->gyr.axes.z = ((buff[10] << 8) | (buff[11] & 0xFF));
+
+  return retval;
+}
+
 // FIFO
 
 ICM_20948_Status_e ICM_20948_enable_FIFO(ICM_20948_Device_t *pdev, bool enable)
