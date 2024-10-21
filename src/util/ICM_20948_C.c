@@ -685,6 +685,8 @@ ICM_20948_Status_e ICM_20948_set_sample_mode(ICM_20948_Device_t *pdev, ICM_20948
   return retval;
 }
 
+
+ICM_20948_fss_t set_fss;
 ICM_20948_Status_e ICM_20948_set_full_scale(ICM_20948_Device_t *pdev, ICM_20948_InternalSensorID_bm sensors, ICM_20948_fss_t fss)
 {
   ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
@@ -715,6 +717,11 @@ ICM_20948_Status_e ICM_20948_set_full_scale(ICM_20948_Device_t *pdev, ICM_20948_
     // Check the data was written correctly
     retval |= ICM_20948_execute_r(pdev, AGB2_REG_GYRO_CONFIG_1, (uint8_t *)&reg, sizeof(ICM_20948_GYRO_CONFIG_1_t));
     if (reg.GYRO_FS_SEL != fss.g) retval |= ICM_20948_Stat_Err;
+  }
+
+  if (retval == ICM_20948_Stat_Ok)
+  {
+    set_fss = fss;
   }
   return retval;
 }
@@ -1121,6 +1128,11 @@ ICM_20948_Status_e ICM_20948_get_agmt_fast(ICM_20948_Device_t *pdev, ICM_20948_A
   pagmt->gyr.axes.x = ((buff[6] << 8) | (buff[7] & 0xFF));
   pagmt->gyr.axes.y = ((buff[8] << 8) | (buff[9] & 0xFF));
   pagmt->gyr.axes.z = ((buff[10] << 8) | (buff[11] & 0xFF));
+
+  //retval |= ICM_20948_set_bank(pdev, 2);
+  //ICM_20948_GYRO_CONFIG_1_t gcfg1;
+  //retval |= ICM_20948_execute_r(pdev, (uint8_t)AGB2_REG_GYRO_CONFIG_1, (uint8_t *)&gcfg1, 1 * sizeof(gcfg1));
+  pagmt->fss = set_fss;
 
   return retval;
 }
